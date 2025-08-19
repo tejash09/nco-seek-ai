@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Sparkles, Zap } from 'lucide-react';
+import { searchJobs } from '@/services/searchService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -19,64 +20,6 @@ export const SearchInterface = ({ onSearch }: SearchInterfaceProps) => {
   const [searchMode, setSearchMode] = useState<SearchMode>('semantic');
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Mock data for demonstration
-  const mockSearch = async (searchQuery: string, mode: SearchMode): Promise<SearchResult[]> => {
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    const mockResults: SearchResult[] = [
-      {
-        job_id: "2511.0100",
-        job_name: "software engineer",
-        job_description: "Design, develop, and maintain software applications and systems. Collaborate with cross-functional teams to create scalable solutions.",
-        similarity_score: 0.92,
-        semantic_score: 0.92,
-        bm25_score: 0.78,
-        final_score: mode === 'hybrid' ? 0.87 : 0.92
-      },
-      {
-        job_id: "2512.0200",
-        job_name: "full stack developer",
-        job_description: "Develop both front-end and back-end components of web applications. Work with databases, APIs, and user interfaces.",
-        similarity_score: 0.85,
-        semantic_score: 0.85,
-        bm25_score: 0.71,
-        final_score: mode === 'hybrid' ? 0.79 : 0.85
-      },
-      {
-        job_id: "2513.0300",
-        job_name: "mobile application developer",
-        job_description: "Create mobile applications for iOS and Android platforms. Optimize performance and user experience for mobile devices.",
-        similarity_score: 0.78,
-        semantic_score: 0.78,
-        bm25_score: 0.65,
-        final_score: mode === 'hybrid' ? 0.73 : 0.78
-      },
-      {
-        job_id: "2514.0400",
-        job_name: "data engineer",
-        job_description: "Build and maintain data pipelines and infrastructure. Process large datasets and ensure data quality and availability.",
-        similarity_score: 0.71,
-        semantic_score: 0.71,
-        bm25_score: 0.58,
-        final_score: mode === 'hybrid' ? 0.66 : 0.71
-      },
-      {
-        job_id: "2515.0500",
-        job_name: "devops engineer",
-        job_description: "Manage infrastructure and deployment processes. Implement CI/CD pipelines and monitor system performance.",
-        similarity_score: 0.68,
-        semantic_score: 0.68,
-        bm25_score: 0.52,
-        final_score: mode === 'hybrid' ? 0.62 : 0.68
-      }
-    ];
-
-    return mockResults.filter(result => 
-      result.job_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.job_description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
-
   const handleSearch = async () => {
     if (!query.trim()) return;
     
@@ -86,7 +29,7 @@ export const SearchInterface = ({ onSearch }: SearchInterfaceProps) => {
     try {
       const searchResults = onSearch ? 
         await onSearch(query, searchMode) : 
-        await mockSearch(query, searchMode);
+        await searchJobs(query, searchMode);
       
       setResults(searchResults);
     } catch (error) {
